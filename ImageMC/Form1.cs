@@ -11,6 +11,8 @@ using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Hook;
+using System.Text.Json;
+
 namespace ImageMC
 {
     public partial class Form1 : Form
@@ -28,6 +30,8 @@ namespace ImageMC
             internal int right;
             internal int bottom;
         }
+        [DllImport("user32")]
+        private static extern bool ClientToScreen(IntPtr windowHandle, ref Point screenPoint);
         [DllImport("user32.dll")]
         public static extern IntPtr WindowFromPoint(POINT pt);
 
@@ -86,12 +90,26 @@ namespace ImageMC
             KeyboardHook.KeyUp += KeyboardHook_KeyUp;
             MouseHook.MouseDown += MouseHook_MouseDown;
             MouseHook.MouseUp += MouseHook_MouseUp;
-            // MouseHook.MouseMove += MouseHook_MouseMove;
+            MouseHook.MouseMove += MouseHook_MouseMove;
 
             //KeyboardHook.HookStart();
             //MouseHook.HookStart();
             FormClosing += Form1_FormClosing;
 
+        }
+
+        private bool MouseHook_MouseMove(MouseEventType type, int x, int y)
+        {
+            if (timer4.Enabled == true)
+            {
+                string ftext = textBox2.Text.Split('/')[0];
+                if(ftext != "")
+                {
+                    textBox2.Text = ftext + "/" + getscreenMoustPosition();
+                }
+                
+            }
+            return true;
         }
 
         private bool KeyboardHook_KeyDown(int vkCode)
@@ -106,16 +124,36 @@ namespace ImageMC
 
         private bool MouseHook_MouseUp(MouseEventType type, int x, int y)
         {
+            //MouseHook.HookEnd();
+            if(timer4.Enabled == true)
+            {
+                timer4.Enabled = false;
+                Console.WriteLine("타이머4 종료");
+            }
             return true;
         }
 
         private bool MouseHook_MouseDown(MouseEventType type, int x, int y)
         {
-            savelabel = "2";
+            if(timer1.Enabled == true)
+            {
+                savelabel = "2";
+            }
             
+            if(timer3.Enabled == true)
+            {
+                timer3.Enabled = false;
+                MouseHook.HookEnd();
+            }
+
+            if(timer4.Enabled == true)
+            {
+                textBox2.Text = getscreenMoustPosition();
+            }
+
+            Console.WriteLine("마우스 다운");
             return true;
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             MouseHook.HookStart();
@@ -130,6 +168,34 @@ namespace ImageMC
             IntPtr hWnd = WindowFromPoint(pt);
             printScreenRed(hWnd);
 
+        }
+        private void printScreenRedMouse(IntPtr hWnd)
+        {
+            try
+            {
+                using (Graphics newGraphics = Graphics.FromHwndInternal(hWnd))
+                {
+                    Rectangle rect = Rectangle.Round(newGraphics.VisibleClipBounds);
+                    Pen redpen = new Pen(Color.Red, 3);
+                    RECT rc = new RECT();
+
+                    string[] checktext = textBox2.Text.Split('/');
+                    if (checktext[0] != null)
+                    {
+                        newGraphics.DrawRectangle(redpen, 0, 0, rect.Width, rect.Height);
+                        newGraphics.Dispose();
+                        redpen.Dispose();
+                    }
+                    if (textBox2.Text.Contains('*'))
+                    {
+                        clearScreen(newGraphics, hWnd, redpen);
+                    }
+                }
+            }
+            catch
+            {
+
+            }
         }
         private void printScreenRed(IntPtr hWnd)
         {
@@ -163,7 +229,8 @@ namespace ImageMC
                         //GetClientRect(hWnd, ref rc);
                         //Console.WriteLine(rc.left + "/" + rc.right);
                         GetWindowRect(hWnd.ToInt32(), ref rc);
-                        MoveWindow(hWnd.ToInt32(), rc.left, rc.top, 500, 300, true);
+                        //크기조절
+                        //MoveWindow(hWnd.ToInt32(), rc.left, rc.top, 500, 300, true);
                         }
                 
                 }
@@ -222,6 +289,20 @@ namespace ImageMC
                 allPrcList.Add(p.MainWindowHandle.ToString() + "/" + p.ProcessName + "/" + p.Id + "/" + p.MainWindowTitle );
             }
         }
+        private String getscreenMoustPosition()
+        {
+            RECT rc = new RECT();
+            GetWindowRect(savehWnd.ToInt32(), ref rc);
+            Rectangle rect = new Rectangle(rc.left, rc.top, rc.right, rc.bottom);
+
+
+            Point p = Cursor.Position;
+            if (rect.Contains(p))
+            {
+                return (Cursor.Position.X - rc.left).ToString() + "," + (Cursor.Position.Y - rc.top).ToString();
+            }
+            return null;
+        }
         private void timer1_Tick(object sender, EventArgs e)
         {
             GetMousePointToWindowHandle();
@@ -265,6 +346,48 @@ namespace ImageMC
             //Console.WriteLine(node.Text);
             node.Nodes.Add("자식");
             treeView1.ExpandAll();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            ITEM item = new ITEM()
+            {
+                parentgroup = "123",
+                eventname = "[1]마우스 입력",
+                imagepath = "1.png"
+            };
+            JsonSerializerOptions jso = new JsonSerializerOptions();
+            jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+
+            string strJson = JsonSerializer.Serialize(item, jso);
+            Console.WriteLine(strJson);
+        }
+
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            textBox2.Text = getscreenMoustPosition();
+            
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            MouseHook.HookStart();
+            timer3.Enabled = true;
+        }
+
+        private void timer4_Tick(object sender, EventArgs e)
+        {
+            if(textBox2.Text != null)
+            {
+                //printScreenRedMouse(savehWnd);
+            }
+            
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            MouseHook.HookStart();
+            timer4.Enabled = true;
         }
     }
 
