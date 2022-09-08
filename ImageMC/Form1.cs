@@ -14,6 +14,10 @@ using System.Runtime.InteropServices;
 using Hook;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
+using OpenCvSharp;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
+using OpenCvSharp.WpfExtensions;
 
 namespace ImageMC
 {
@@ -337,7 +341,7 @@ namespace ImageMC
             return cropImage;
         }//https://mangveloper.com/15
 
-        private void getScreen(IntPtr hWnd)
+        private Bitmap getScreen(IntPtr hWnd)
         {
             Graphics graphics = Graphics.FromHwnd(hWnd);
             
@@ -356,9 +360,9 @@ namespace ImageMC
                 g.ReleaseHdc(hdc);
             }
             pictureBox1.Size = new Size(Convert.ToInt32(myitem.mywidth) -2, Convert.ToInt32(myitem.myheight)-2);
-            pictureBox1.Image = cropAtRect(bitmap, rect2);
-
-
+            Bitmap im = cropAtRect(bitmap, rect2);
+            pictureBox1.Image = im;
+            return im;
         }
         private void getAllPrc()
         {
@@ -399,7 +403,6 @@ namespace ImageMC
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
             treeView1.CheckBoxes = true;
             //combobox
             comboBox1.Items.Add("마우스 클릭");
@@ -581,14 +584,15 @@ namespace ImageMC
             }
                 
         }
-        private void getimage()
+        private Bitmap getimage()
         {
             string[] checktext = textBox2.Text.Split('/');
             float wi = float.Parse(checktext[1].Split(',')[0]) - float.Parse(checktext[0].Split(',')[0]);
             float he = float.Parse(checktext[1].Split(',')[1]) - float.Parse(checktext[0].Split(',')[1]);
             myitem.mywidth = wi;
             myitem.myheight = he;
-            getScreen(savehWnd);
+            Bitmap aa =  getScreen(savehWnd);
+            return aa;
         }
         private void button10_Click(object sender, EventArgs e)
         {
@@ -599,13 +603,11 @@ namespace ImageMC
             //Message(eventenum.Keyboard, item);*/
             //getAllPrc();
 
-            //2번째테스트
-            //getimage();
-            ITEM item = new ITEM();
-            item.position = "57,51";
-            item.keyvalue = "abc/안녕 하세요";
-            Message(eventenum.Mouse, item);
+            //2번째테스트 이미지 저장
 
+
+            //이미지불러오기
+            getimage();
             //Console.WriteLine(GetParent(savehWnd));
             //197170 - > 바로 블루스택 부모핸들 가져옴
 
@@ -834,6 +836,80 @@ namespace ImageMC
             }
         }
         public static int MakeLParam(int x, int y) => (y << 16) | (x & 0xFFFF);
+
+        private double ImageSearch()
+        {
+            //using (Mat mat = new Mat(@"img\multiCat.png"))
+            //원본이미지 캡쳐해서 bitmap 가져옴
+            Bitmap screenbitmap = new Bitmap(@"");
+            Mat screenimage = BitmapSourceConverter.ToMat(screenbitmap.ToBitmapSource());
+            Bitmap findbitmap = new Bitmap(@"");
+            Mat findimage = BitmapSourceConverter.ToMat(findbitmap.ToBitmapSource());
+
+            double minval, maxval;
+            using (Mat resultimage = new Mat())
+            {
+                //매칭
+                Cv2.MatchTemplate(screenimage, findimage, resultimage, TemplateMatchModes.CCoeffNormed);
+                //매칭 범위 지정
+                Cv2.Threshold(resultimage, resultimage, 0.8, 1.0, ThresholdTypes.Tozero);
+
+                
+                while (true)
+                {
+                    OpenCvSharp.Point minloc, maxloc;
+
+                    Cv2.MinMaxLoc(resultimage, out minval, out maxval, out minloc, out maxloc);
+                    var matchval = 0.8;
+                    if (maxval >= matchval)
+                    {
+                        Console.WriteLine("유사도 : " + maxval);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+               
+            //Cv2.MatchTemplate(원본이미지,찾을이미지,결과값이미지,TemplateMatchModes.CCoeffNormed)
+
+            return maxval;
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+
+            string fileName = "";
+
+            SaveFileDialog saveFile = new SaveFileDialog();
+
+            // 다이얼 로그가 Open되었을 때 최초의 경로 설정
+            //saveFile.InitialDirectory = @"C:";   
+
+            // 다이얼 로그의 제목
+            saveFile.Title = "스크립트 저장위치 지정";
+
+            // 기본 확장자
+            saveFile.DefaultExt = "png";
+
+            // 파일 목록 필터링
+            saveFile.Filter = "Png files(*.png)|*.png";
+
+            // OK버튼을 눌렀을때의 동작
+            if (saveFile.ShowDialog() == DialogResult.OK)
+            {
+                // 경로와 파일명을 fileName에 저장
+                fileName = saveFile.FileName.ToString();
+                //Console.WriteLine(fileName);
+
+                //StreamWriter w;
+                pictureBox1.Image.Save(fileName, ImageFormat.Png);
+
+            }
+
+            
+        }
     }
 
     

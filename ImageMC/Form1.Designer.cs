@@ -68,6 +68,7 @@ namespace ImageMC
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.button8 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
+            this.button12 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -331,9 +332,9 @@ namespace ImageMC
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(115, 387);
+            this.button5.Location = new System.Drawing.Point(183, 387);
             this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(78, 63);
+            this.button5.Size = new System.Drawing.Size(44, 63);
             this.button5.TabIndex = 8;
             this.button5.Text = "마우스 위치설정";
             this.button5.UseVisualStyleBackColor = true;
@@ -349,7 +350,7 @@ namespace ImageMC
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(540, 73);
+            this.button4.Location = new System.Drawing.Point(327, 0);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(84, 59);
             this.button4.TabIndex = 7;
@@ -371,7 +372,7 @@ namespace ImageMC
             this.groupBox2.Controls.Add(this.button9);
             this.groupBox2.Controls.Add(this.textBox5);
             this.groupBox2.Controls.Add(this.button8);
-            this.groupBox2.Location = new System.Drawing.Point(12, 456);
+            this.groupBox2.Location = new System.Drawing.Point(12, 487);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(268, 55);
             this.groupBox2.TabIndex = 19;
@@ -415,11 +416,22 @@ namespace ImageMC
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
+            // button12
+            // 
+            this.button12.Location = new System.Drawing.Point(97, 387);
+            this.button12.Name = "button12";
+            this.button12.Size = new System.Drawing.Size(80, 63);
+            this.button12.TabIndex = 25;
+            this.button12.Text = "이미지 저장";
+            this.button12.UseVisualStyleBackColor = true;
+            this.button12.Click += new System.EventHandler(this.button12_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(712, 518);
+            this.ClientSize = new System.Drawing.Size(712, 554);
+            this.Controls.Add(this.button12);
             this.Controls.Add(this.button10);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.button4);
@@ -484,6 +496,7 @@ namespace ImageMC
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button button11;
         private System.Windows.Forms.Label comboBox2;
+        private System.Windows.Forms.Button button12;
     }
 }
 
