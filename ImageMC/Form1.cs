@@ -53,9 +53,6 @@ namespace ImageMC
         internal static extern bool PrintWindow(IntPtr hWnd, IntPtr hdcBlt, int nFlags);
 
         [DllImport("user32.dll")]
-        static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint dwData, int dwExtraInfo);
-
-        [DllImport("user32.dll")]
         public static extern bool UpdateWindow(IntPtr hWnd);
 
         [DllImport("user32.dll")]
@@ -66,12 +63,24 @@ namespace ImageMC
 
         [DllImport("user32")] 
         public static extern int GetWindowRect(int hwnd, ref RECT lpRect);
-        
 
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+        [DllImport("user32.dll")]
+        public static extern int PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern bool PostMessage(IntPtr hWnd, uint msg, int wParam, IntPtr lParam);
+        [DllImport("user32.dll")] public static extern int FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr FindWindowEx(IntPtr hWnd1, int hWnd2, string lpsz1, string lpsz2);
+        [DllImport("user32.dll")] public static extern Int32 GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
         List<String> allPrcList;
         String savelabel = "0";
         IntPtr savehWnd;
         int saveint = 0;
+        //부모[블루스택]의 핸들
+        IntPtr gohWnd = IntPtr.Zero;
         MYITEM myitem = new MYITEM();
         List<ITEM> ScriptList = new List<ITEM>();
         string path = Directory.GetCurrentDirectory();
@@ -175,6 +184,13 @@ namespace ImageMC
             if(timer1.Enabled == true)
             {
                 savelabel = "2";
+                Console.WriteLine("크기조절");
+                //크기조절
+                RECT rc = new RECT();
+                GetClientRect((IntPtr)gohWnd, ref rc);
+                MoveWindow(gohWnd.ToInt32(), rc.left, rc.top, 674, 394, true);
+                MouseHook.HookEnd();
+                timer1.Enabled = false;
             }
             
             if(timer3.Enabled == true)
@@ -267,13 +283,12 @@ namespace ImageMC
                             savelabel = "0";
                             MouseHook.HookEnd();
                             timer1.Enabled = false;
-                        //GetClientRect(hWnd, ref rc);
+                        //
                         //Console.WriteLine(rc.left + "/" + rc.right);
                         GetWindowRect(hWnd.ToInt32(), ref rc);
-                        //크기조절
-                        //MoveWindow(hWnd.ToInt32(), rc.left, rc.top, 500, 300, true);
-                        }
-                
+      
+                    }
+
                 }
             }
             catch
@@ -295,8 +310,14 @@ namespace ImageMC
                 UpdateWindow(aa);
 
                 savelabel = "1";
-                label2.Text = hWnd.ToString();
+                uint pid;
+                GetWindowThreadProcessId(hWnd,out pid);
+                Process localById = Process.GetProcessById(Convert.ToInt32(pid));
+                gohWnd = GetParent(hWnd);
+                label2.Text = hWnd.ToString() + "/" + gohWnd + "/" + localById.MainWindowTitle;
                 savehWnd = hWnd;
+                //Console.WriteLine("세이브 핸들");
+
             }
             catch
             {
@@ -341,14 +362,20 @@ namespace ImageMC
         }
         private void getAllPrc()
         {
-            Process[] processes = Process.GetProcesses();
+            /*Process[] processes = Process.GetProcesses();
+            Process currentProcess = Process.GetCurrentProcess();
             allPrcList = new List<string>();
             foreach (Process p in processes)
             {
                 //Debug.WriteLine(p.Id + " " + p.ProcessName + " " + p.MainWindowTitle+ "/" + p.MainWindowHandle);
                 // + "/" + p.ProcessName.ToString() + "/" + p.MainWindowTitle.ToString()
-                allPrcList.Add(p.MainWindowHandle.ToString() + "/" + p.ProcessName + "/" + p.Id + "/" + p.MainWindowTitle );
-            }
+                //allPrcList.Add(p.MainWindowHandle.ToString() + "/" + p.ProcessName + "/" + p.Id + "/" + p.MainWindowTitle );
+                Console.WriteLine(p.MainWindowHandle + "/" + p.ProcessName + "/" + p.Id);
+            }*/
+            Process localById = Process.GetProcessById(11584);
+            Console.WriteLine(localById);
+            
+            
         }
         private String getscreenMoustPosition()
         {
@@ -554,17 +581,49 @@ namespace ImageMC
             }
                 
         }
-
+        private void getimage()
+        {
+            string[] checktext = textBox2.Text.Split('/');
+            float wi = float.Parse(checktext[1].Split(',')[0]) - float.Parse(checktext[0].Split(',')[0]);
+            float he = float.Parse(checktext[1].Split(',')[1]) - float.Parse(checktext[0].Split(',')[1]);
+            myitem.mywidth = wi;
+            myitem.myheight = he;
+            getScreen(savehWnd);
+        }
         private void button10_Click(object sender, EventArgs e)
         {
-            for(int i = 0; i<ScriptList.Count; i++)
-            {
-                JsonSerializerOptions jso = new JsonSerializerOptions();
-                jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+            /*ITEM item = new ITEM();
+            item.position = "57,51";
+            item.keyvalue = "abc/안녕 하세요";
+            Message(eventenum.Mouse, item);
+            //Message(eventenum.Keyboard, item);*/
+            //getAllPrc();
 
-                string strJson = JsonSerializer.Serialize(ScriptList[i], jso);
-                Console.WriteLine(strJson);
+            //2번째테스트
+            //getimage();
+            ITEM item = new ITEM();
+            item.position = "57,51";
+            item.keyvalue = "abc/안녕 하세요";
+            Message(eventenum.Mouse, item);
+
+            //Console.WriteLine(GetParent(savehWnd));
+            //197170 - > 바로 블루스택 부모핸들 가져옴
+
+            /*void ChildWindows(HWND parentHwnd)
+            {
+                HWND childHwnd;
+                childHwnd = GetWindow(parentHwnd, GW_CHILD);
+
+                while (childHwnd)
+                {
+                    printf("%#08x\n", childHwnd);
+                    ChildWindows(childHwnd);
+                    childHwnd = GetNextWindow(childHwnd, GW_HWNDNEXT);
+                }
+
+                return;
             }
+        출처: https://munggeun.tistory.com/7 [뭉근 : 느긋하게 타는 불:티스토리]*/
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -737,6 +796,44 @@ namespace ImageMC
                 pictureBox1.Image = bitmap;
             }
         }
+        enum eventenum
+        {
+            Mouse,Keyboard
+        }
+        private void Message(eventenum eventenum,ITEM item)
+        {
+            
+            if (eventenum == eventenum.Mouse)
+            {
+                Console.WriteLine("마우스 이벤트");
+
+                POINT pt = new POINT();
+
+                pt.x = Convert.ToInt32(item.position.Split(',')[0]);
+                pt.y = Convert.ToInt32(item.position.Split(',')[1]);
+
+                int X = pt.x;
+                int Y = pt.y;
+                int lparm = (Y << 16) + X;
+                //액티브
+                PostMessage(savehWnd, 0x0006, 1, 0);
+                PostMessage(savehWnd, 0x0201, 1, lparm);//다운
+                System.Threading.Thread.Sleep(100);
+                PostMessage(savehWnd, 0x0202, 0, lparm);//업
+
+            }
+
+            if(eventenum == eventenum.Keyboard)
+            {
+
+                foreach(char key in item.keyvalue)
+                {
+                    PostMessage(savehWnd, 0x102, key, IntPtr.Zero);
+                }
+                
+            }
+        }
+        public static int MakeLParam(int x, int y) => (y << 16) | (x & 0xFFFF);
     }
 
     

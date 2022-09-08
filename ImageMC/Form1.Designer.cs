@@ -38,6 +38,8 @@ namespace ImageMC
             this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.comboBox2 = new System.Windows.Forms.Label();
+            this.button11 = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label9 = new System.Windows.Forms.Label();
@@ -66,8 +68,6 @@ namespace ImageMC
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.button8 = new System.Windows.Forms.Button();
             this.button10 = new System.Windows.Forms.Button();
-            this.button11 = new System.Windows.Forms.Button();
-            this.comboBox2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -109,7 +109,7 @@ namespace ImageMC
             // 
             this.button2.Location = new System.Drawing.Point(211, 20);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(66, 23);
+            this.button2.Size = new System.Drawing.Size(65, 23);
             this.button2.TabIndex = 4;
             this.button2.Text = "그룹추가";
             this.button2.UseVisualStyleBackColor = true;
@@ -156,6 +156,25 @@ namespace ImageMC
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "설정";
             // 
+            // comboBox2
+            // 
+            this.comboBox2.AutoSize = true;
+            this.comboBox2.Location = new System.Drawing.Point(139, 194);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(65, 12);
+            this.comboBox2.TabIndex = 26;
+            this.comboBox2.Text = "이미지이름";
+            // 
+            // button11
+            // 
+            this.button11.Location = new System.Drawing.Point(93, 168);
+            this.button11.Name = "button11";
+            this.button11.Size = new System.Drawing.Size(149, 23);
+            this.button11.TabIndex = 25;
+            this.button11.Text = "이미지선택";
+            this.button11.UseVisualStyleBackColor = true;
+            this.button11.Click += new System.EventHandler(this.comboBox2_Click);
+            // 
             // label10
             // 
             this.label10.AutoSize = true;
@@ -200,9 +219,9 @@ namespace ImageMC
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(144, 326);
+            this.button7.Location = new System.Drawing.Point(124, 326);
             this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(66, 63);
+            this.button7.Size = new System.Drawing.Size(113, 63);
             this.button7.TabIndex = 19;
             this.button7.Text = "이벤트 삭제";
             this.button7.UseVisualStyleBackColor = true;
@@ -276,9 +295,9 @@ namespace ImageMC
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(31, 326);
+            this.button3.Location = new System.Drawing.Point(9, 326);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(76, 63);
+            this.button3.Size = new System.Drawing.Size(109, 63);
             this.button3.TabIndex = 6;
             this.button3.Text = "이벤트 추가";
             this.button3.UseVisualStyleBackColor = true;
@@ -330,7 +349,7 @@ namespace ImageMC
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(319, 0);
+            this.button4.Location = new System.Drawing.Point(540, 73);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(84, 59);
             this.button4.TabIndex = 7;
@@ -395,25 +414,6 @@ namespace ImageMC
             this.button10.Text = "테스트";
             this.button10.UseVisualStyleBackColor = true;
             this.button10.Click += new System.EventHandler(this.button10_Click);
-            // 
-            // button11
-            // 
-            this.button11.Location = new System.Drawing.Point(93, 168);
-            this.button11.Name = "button11";
-            this.button11.Size = new System.Drawing.Size(149, 23);
-            this.button11.TabIndex = 25;
-            this.button11.Text = "이미지선택";
-            this.button11.UseVisualStyleBackColor = true;
-            this.button11.Click += new System.EventHandler(this.comboBox2_Click);
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.AutoSize = true;
-            this.comboBox2.Location = new System.Drawing.Point(139, 194);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(65, 12);
-            this.comboBox2.TabIndex = 26;
-            this.comboBox2.Text = "이미지이름";
             // 
             // Form1
             // 
