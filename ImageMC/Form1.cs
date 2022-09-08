@@ -65,7 +65,7 @@ namespace ImageMC
         [DllImport("user32")]
         public static extern int MoveWindow(int hwnd, int x, int y, int nWidth, int nHeight, bool bRepaint);
 
-        [DllImport("user32")] 
+        [DllImport("user32")]
         public static extern int GetWindowRect(int hwnd, ref RECT lpRect);
 
         [DllImport("user32.dll")]
@@ -132,7 +132,7 @@ namespace ImageMC
                     string ftext = textBox2.Text.Split('/')[0];
                     if (ftext != "")
                     {
-                        
+
                         clearScreen(myitem.mygrahics, savehWnd, myitem.mypen);
                         textBox2.Text = ftext + "/" + getscreenMoustPosition();
 
@@ -145,7 +145,7 @@ namespace ImageMC
                         myitem.myheight = he;
 
                         printScreenRedMouse(savehWnd);
-                        getScreen(savehWnd);
+                        getScreen(savehWnd, true);
 
                     }
 
@@ -173,7 +173,7 @@ namespace ImageMC
         private bool MouseHook_MouseUp(MouseEventType type, int x, int y)
         {
             //MouseHook.HookEnd();
-            if(timer4.Enabled == true)
+            if (timer4.Enabled == true)
             {
                 clearScreen(myitem.mygrahics, savehWnd, myitem.mypen);
                 timer4.Enabled = false;
@@ -185,7 +185,7 @@ namespace ImageMC
 
         private bool MouseHook_MouseDown(MouseEventType type, int x, int y)
         {
-            if(timer1.Enabled == true)
+            if (timer1.Enabled == true)
             {
                 savelabel = "2";
                 Console.WriteLine("크기조절");
@@ -196,14 +196,14 @@ namespace ImageMC
                 MouseHook.HookEnd();
                 timer1.Enabled = false;
             }
-            
-            if(timer3.Enabled == true)
+
+            if (timer3.Enabled == true)
             {
                 timer3.Enabled = false;
                 MouseHook.HookEnd();
             }
 
-            if(timer4.Enabled == true)
+            if (timer4.Enabled == true)
             {
                 textBox2.Text = getscreenMoustPosition();
             }
@@ -236,7 +236,7 @@ namespace ImageMC
                     Pen redpen = new Pen(Color.Red, 1);
                     RECT rc = new RECT();
 
-                    
+
 
                     string[] checktext = textBox2.Text.Split('/');
 
@@ -245,7 +245,7 @@ namespace ImageMC
 
                     if (checktext[0] != null)
                     {
-                        newGraphics.DrawRectangle(redpen, float.Parse(checktext[0].Split(',')[0]) -2, float.Parse(checktext[0].Split(',')[1]) -2, wi, he);
+                        newGraphics.DrawRectangle(redpen, float.Parse(checktext[0].Split(',')[0]) - 2, float.Parse(checktext[0].Split(',')[1]) - 2, wi, he);
                         myitem.mygrahics = newGraphics;
                         myitem.mypen = redpen;
                         newGraphics.Dispose();
@@ -269,28 +269,28 @@ namespace ImageMC
                     Pen redpen = new Pen(Color.Red, 3);
                     RECT rc = new RECT();
 
-                
-                    if(savelabel == "1")
+
+                    if (savelabel == "1")
                     {
-                            newGraphics.DrawRectangle(redpen, 0, 0, rect.Width, rect.Height);
-                            newGraphics.Dispose();
-                            redpen.Dispose();
-                            savelabel = "0";
+                        newGraphics.DrawRectangle(redpen, 0, 0, rect.Width, rect.Height);
+                        newGraphics.Dispose();
+                        redpen.Dispose();
+                        savelabel = "0";
                     }
                     if (label2.Text != hWnd.ToString())
                     {
-                            clearScreen(newGraphics, hWnd, redpen);
+                        clearScreen(newGraphics, hWnd, redpen);
                     }
-                        if (savelabel == "2")
-                        {
-                            clearScreen(newGraphics, hWnd, redpen);
-                            savelabel = "0";
-                            MouseHook.HookEnd();
-                            timer1.Enabled = false;
+                    if (savelabel == "2")
+                    {
+                        clearScreen(newGraphics, hWnd, redpen);
+                        savelabel = "0";
+                        MouseHook.HookEnd();
+                        timer1.Enabled = false;
                         //
                         //Console.WriteLine(rc.left + "/" + rc.right);
                         GetWindowRect(hWnd.ToInt32(), ref rc);
-      
+
                     }
 
                 }
@@ -299,9 +299,9 @@ namespace ImageMC
             {
 
             }
-            
 
-                
+
+
         }
         private void clearScreen(Graphics newGraphics, IntPtr hWnd, Pen redpen)
         {
@@ -315,7 +315,7 @@ namespace ImageMC
 
                 savelabel = "1";
                 uint pid;
-                GetWindowThreadProcessId(hWnd,out pid);
+                GetWindowThreadProcessId(hWnd, out pid);
                 Process localById = Process.GetProcessById(Convert.ToInt32(pid));
                 gohWnd = GetParent(hWnd);
                 label2.Text = hWnd.ToString() + "/" + gohWnd + "/" + localById.MainWindowTitle;
@@ -327,7 +327,7 @@ namespace ImageMC
             {
 
             }
-            
+
         }
         public Bitmap cropAtRect(Bitmap orgImg, Rectangle sRect)
         {
@@ -341,27 +341,31 @@ namespace ImageMC
             return cropImage;
         }//https://mangveloper.com/15
 
-        private Bitmap getScreen(IntPtr hWnd)
+        private Bitmap getScreen(IntPtr hWnd, bool check)
         {
             Graphics graphics = Graphics.FromHwnd(hWnd);
-            
+
             Rectangle rect = Rectangle.Round(graphics.VisibleClipBounds);
             //Bitmap bmp = new Bitmap(rect.Width, rect.Height);
-            Bitmap bitmap = new Bitmap(rect.Width,rect.Height);
+            Bitmap bitmap = new Bitmap(rect.Width, rect.Height);
 
             string[] checktext = textBox2.Text.Split('/');
 
             Rectangle rect2 = new Rectangle(Convert.ToInt32(checktext[0].Split(',')[0]), Convert.ToInt32(checktext[0].Split(',')[1]), Convert.ToInt32(myitem.mywidth), Convert.ToInt32(myitem.myheight));
-            
+
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 IntPtr hdc = g.GetHdc();
                 PrintWindow(hWnd, hdc, 0x2);
                 g.ReleaseHdc(hdc);
             }
-            pictureBox1.Size = new Size(Convert.ToInt32(myitem.mywidth) -2, Convert.ToInt32(myitem.myheight)-2);
             Bitmap im = cropAtRect(bitmap, rect2);
-            pictureBox1.Image = im;
+            if (check)
+            {
+                pictureBox1.Size = new Size(Convert.ToInt32(myitem.mywidth) - 2, Convert.ToInt32(myitem.myheight) - 2);
+                pictureBox1.Image = im;
+            }
+
             return im;
         }
         private void getAllPrc()
@@ -378,8 +382,8 @@ namespace ImageMC
             }*/
             Process localById = Process.GetProcessById(11584);
             Console.WriteLine(localById);
-            
-            
+
+
         }
         private String getscreenMoustPosition()
         {
@@ -398,7 +402,7 @@ namespace ImageMC
         private void timer1_Tick(object sender, EventArgs e)
         {
             GetMousePointToWindowHandle();
-            
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -409,7 +413,7 @@ namespace ImageMC
             comboBox1.Items.Add("키보드 입력");
             comboBox1.Items.Add("이미지 인식");
         }
-        
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             KeyboardHook.HookEnd();
@@ -443,12 +447,12 @@ namespace ImageMC
                 MessageBox.Show("이미 있는 그룹이름");
             }
 
-            
+
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
-  
+
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -457,7 +461,7 @@ namespace ImageMC
             int c = 0;
             try
             {
-                
+
                 ITEM saveitem = new ITEM();
                 TreeNode node = treeView1.SelectedNode;
                 //Console.WriteLine(node.Text);
@@ -470,7 +474,7 @@ namespace ImageMC
                 saveitem.action = richTextBox1.Text;
                 saveitem.parentgroup = node.Text;
 
-                for(int i =0; i < ScriptList.Count; i++)
+                for (int i = 0; i < ScriptList.Count; i++)
                 {
                     if (ScriptList[i].eventname == saveitem.eventname)
                     {
@@ -478,22 +482,22 @@ namespace ImageMC
                     }
                 }
 
-                    if (c == 0)
-                    {
-                        node.Nodes.Add(saveitem.eventname);
-                        ScriptList.Add(saveitem);
-                        treeView1.ExpandAll();
-                    }
-                    else
-                    {
-                        MessageBox.Show("이미 있는 그룹이름");
-                    }
+                if (c == 0)
+                {
+                    node.Nodes.Add(saveitem.eventname);
+                    ScriptList.Add(saveitem);
+                    treeView1.ExpandAll();
+                }
+                else
+                {
+                    MessageBox.Show("이미 있는 그룹이름");
+                }
             }
             catch
             {
 
             }
-            
+
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -514,7 +518,7 @@ namespace ImageMC
         private void timer3_Tick(object sender, EventArgs e)
         {
             textBox2.Text = getscreenMoustPosition();
-            
+
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -525,11 +529,11 @@ namespace ImageMC
 
         private void timer4_Tick(object sender, EventArgs e)
         {
-            if(textBox2.Text != null)
+            if (textBox2.Text != null)
             {
                 //printScreenRedMouse(savehWnd);
             }
-            
+
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -543,9 +547,9 @@ namespace ImageMC
         {
             TreeNode node = treeView1.SelectedNode;
             node.Remove();
-            for(int i =0; i<ScriptList.Count; i++)
+            for (int i = 0; i < ScriptList.Count; i++)
             {
-                if(node.Text == ScriptList[i].eventname)
+                if (node.Text == ScriptList[i].eventname)
                 {
                     ScriptList.RemoveAt(i);
                 }
@@ -555,7 +559,7 @@ namespace ImageMC
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(comboBox1.SelectedIndex.ToString() != null)
+            if (comboBox1.SelectedIndex.ToString() != null)
             {
                 if (comboBox1.SelectedItem.ToString() == "키보드 입력")
                 {
@@ -582,16 +586,17 @@ namespace ImageMC
                     button11.Enabled = true;
                 }
             }
-                
+
         }
         private Bitmap getimage()
         {
+            //이미지 테스트할때 쓰는 함수
             string[] checktext = textBox2.Text.Split('/');
             float wi = float.Parse(checktext[1].Split(',')[0]) - float.Parse(checktext[0].Split(',')[0]);
             float he = float.Parse(checktext[1].Split(',')[1]) - float.Parse(checktext[0].Split(',')[1]);
             myitem.mywidth = wi;
             myitem.myheight = he;
-            Bitmap aa =  getScreen(savehWnd);
+            Bitmap aa = getScreen(savehWnd, false);
             return aa;
         }
         private void button10_Click(object sender, EventArgs e)
@@ -607,7 +612,7 @@ namespace ImageMC
 
 
             //이미지불러오기
-            getimage();
+            Console.WriteLine("테스트 버튼 : " + ImageSearch());
             //Console.WriteLine(GetParent(savehWnd));
             //197170 - > 바로 블루스택 부모핸들 가져옴
 
@@ -632,9 +637,10 @@ namespace ImageMC
         {
             TreeNode node = treeView1.SelectedNode;
 
-            for(int i = 0; i< ScriptList.Count; i++)
+            for (int i = 0; i < ScriptList.Count; i++)
             {
-                if(ScriptList[i].eventname == node.Text){
+                if (ScriptList[i].eventname == node.Text)
+                {
 
                     textBox1.Text = ScriptList[i].eventname;
                     textBox2.Text = ScriptList[i].position;
@@ -650,7 +656,7 @@ namespace ImageMC
 
         private void button8_Click(object sender, EventArgs e)
         {
-            
+
             string fileName = "";
 
             SaveFileDialog saveFile = new SaveFileDialog();
@@ -691,12 +697,12 @@ namespace ImageMC
             ScriptList.Clear();
 
             string filename = "";
-            
+
             OpenFileDialog openFile = new OpenFileDialog();
 
             openFile.DefaultExt = "json";
             openFile.Filter = "Json files(*.json)|*.json";
-            if(openFile.ShowDialog() == DialogResult.OK)
+            if (openFile.ShowDialog() == DialogResult.OK)
             {
                 filename = openFile.FileName.ToString();
                 textBox5.Text = filename;
@@ -741,7 +747,7 @@ namespace ImageMC
             for (int j = 0; j < ScriptList.Count; j++)
             {
                 //Console.WriteLine(j);
-                if(ScriptList[j].parentgroup == ScriptList[j].eventname)
+                if (ScriptList[j].parentgroup == ScriptList[j].eventname)
                 {
                     //부모객체 추가
                     //Console.WriteLine("부모객체 추가 {0}", ScriptList[j].eventname);
@@ -750,12 +756,12 @@ namespace ImageMC
                     treeView1.Nodes.Add(node);
                     treeView1.ExpandAll();
 
-                    foreach(ITEM item in ScriptList)
+                    foreach (ITEM item in ScriptList)
                     {
-                        if(item.parentgroup == node.Text && item.parentgroup != item.eventname)
+                        if (item.parentgroup == node.Text && item.parentgroup != item.eventname)
                         {
                             //자식객체 추가
-                           // Console.WriteLine("자식객체 추가 {0}", item.eventname);
+                            // Console.WriteLine("자식객체 추가 {0}", item.eventname);
                             node.Nodes.Add(item.eventname);
                         }
                     }
@@ -785,9 +791,9 @@ namespace ImageMC
 
                 var bitmap = new Bitmap(filename);
 
-                for(int x = 0; x < bitmap.Width; x++)
+                for (int x = 0; x < bitmap.Width; x++)
                 {
-                    for(int y=0; y <bitmap.Height; y++)
+                    for (int y = 0; y < bitmap.Height; y++)
                     {
                         Color color = bitmap.GetPixel(x, y);
                         color = Color.FromArgb(0, color);
@@ -800,11 +806,11 @@ namespace ImageMC
         }
         enum eventenum
         {
-            Mouse,Keyboard
+            Mouse, Keyboard
         }
-        private void Message(eventenum eventenum,ITEM item)
+        private void Message(eventenum eventenum, ITEM item)
         {
-            
+
             if (eventenum == eventenum.Mouse)
             {
                 Console.WriteLine("마우스 이벤트");
@@ -825,14 +831,14 @@ namespace ImageMC
 
             }
 
-            if(eventenum == eventenum.Keyboard)
+            if (eventenum == eventenum.Keyboard)
             {
 
-                foreach(char key in item.keyvalue)
+                foreach (char key in item.keyvalue)
                 {
                     PostMessage(savehWnd, 0x102, key, IntPtr.Zero);
                 }
-                
+
             }
         }
         public static int MakeLParam(int x, int y) => (y << 16) | (x & 0xFFFF);
@@ -841,9 +847,9 @@ namespace ImageMC
         {
             //using (Mat mat = new Mat(@"img\multiCat.png"))
             //원본이미지 캡쳐해서 bitmap 가져옴
-            Bitmap screenbitmap = new Bitmap(@"");
+            Bitmap screenbitmap = getimage();
             Mat screenimage = BitmapSourceConverter.ToMat(screenbitmap.ToBitmapSource());
-            Bitmap findbitmap = new Bitmap(@"");
+            Bitmap findbitmap = new Bitmap(@"C:\Users\GGG\Downloads\ImageMC\ImageMC\bin\Debug\image\1.png");
             Mat findimage = BitmapSourceConverter.ToMat(findbitmap.ToBitmapSource());
 
             double minval, maxval;
@@ -854,7 +860,7 @@ namespace ImageMC
                 //매칭 범위 지정
                 Cv2.Threshold(resultimage, resultimage, 0.8, 1.0, ThresholdTypes.Tozero);
 
-                
+
                 while (true)
                 {
                     OpenCvSharp.Point minloc, maxloc;
@@ -864,6 +870,7 @@ namespace ImageMC
                     if (maxval >= matchval)
                     {
                         Console.WriteLine("유사도 : " + maxval);
+                        break;
                     }
                     else
                     {
@@ -871,7 +878,7 @@ namespace ImageMC
                     }
                 }
             }
-               
+
             //Cv2.MatchTemplate(원본이미지,찾을이미지,결과값이미지,TemplateMatchModes.CCoeffNormed)
 
             return maxval;
@@ -908,9 +915,7 @@ namespace ImageMC
 
             }
 
-            
+
         }
     }
-
-    
 }

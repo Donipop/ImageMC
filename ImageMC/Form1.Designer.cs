@@ -408,7 +408,7 @@ namespace ImageMC
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(327, 456);
+            this.button10.Location = new System.Drawing.Point(521, 63);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(76, 63);
             this.button10.TabIndex = 24;
